@@ -40,3 +40,6 @@ next-env.d.ts
 /.sites-runtime/
 /outputs/
 /work/
+
+# local Arduino Wi-Fi/database credentials
+arduino/Healthi/arduino_secrets.h
