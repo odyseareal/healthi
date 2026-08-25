@@ -75,11 +75,15 @@ void restoreMetrics(const String& response) {
 }
 
 bool requestStartupMetrics() {
-  String path = "/rest/v1/healthi_devices?device_id=eq." + deviceId + "&select=metrics&limit=1";
+  String body = String(F("{\"p_device_id\":\"")) + deviceId + F("\"}");
   cloudClient.beginRequest();
-  cloudClient.get(path);
+  cloudClient.post("/rest/v1/rpc/get_healthi_device");
   cloudClient.sendHeader("apikey", HEALTHI_SUPABASE_PUBLISHABLE_KEY);
   cloudClient.sendHeader("Authorization", String("Bearer ") + HEALTHI_SUPABASE_PUBLISHABLE_KEY);
+  cloudClient.sendHeader("Content-Type", "application/json");
+  cloudClient.sendHeader("Content-Length", body.length());
+  cloudClient.beginBody();
+  cloudClient.print(body);
   cloudClient.endRequest();
 
   int status = cloudClient.responseStatusCode();
@@ -102,18 +106,17 @@ bool requestStartupMetrics() {
 bool uploadMetrics() {
   String body;
   body.reserve(1150);
-  body = F("{\"device_id\":\"");
+  body = F("{\"p_device_id\":\"");
   body += deviceId;
-  body += F("\",\"metrics\":");
+  body += F("\",\"p_metrics\":");
   body += buildTelemetryJson();
   body += F("}");
 
   cloudClient.beginRequest();
-  cloudClient.post("/rest/v1/healthi_devices?on_conflict=device_id");
+  cloudClient.post("/rest/v1/rpc/upsert_healthi_metrics");
   cloudClient.sendHeader("apikey", HEALTHI_SUPABASE_PUBLISHABLE_KEY);
   cloudClient.sendHeader("Authorization", String("Bearer ") + HEALTHI_SUPABASE_PUBLISHABLE_KEY);
   cloudClient.sendHeader("Content-Type", "application/json");
-  cloudClient.sendHeader("Prefer", "resolution=merge-duplicates,return=minimal");
   cloudClient.sendHeader("Content-Length", body.length());
   cloudClient.beginBody();
   cloudClient.print(body);
