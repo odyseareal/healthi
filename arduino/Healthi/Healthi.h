@@ -255,4 +255,5 @@ void drawMomentumPage();
 void updateDisplay();
 
 // ---------------- Telemetry ----------------
+String buildTelemetryJson();
 void printSerialData();
