@@ -62,6 +62,7 @@
 */
 
 #include "Healthi.h"
+#include "HealthiNetwork.h"
 
 // ---------------- Arduino setup / loop ----------------
 void setup() {
@@ -91,6 +92,7 @@ void setup() {
   calibrateGyroscope();
   previousRollDeg=rollDeg; previousPitchDeg=pitchDeg;
   lastSampleUs=micros(); lastLoopMs=millis();
+  beginHealthiCloud();
   Serial.println(F("Fitness tracker ready. Hold joystick click for menu."));
 }
 
@@ -99,6 +101,6 @@ void loop() {
   InputEvents input=readInput(); handleInput(input);
   updateMotion(); updateSleepTracker(); updateFallDetector();
   updateStepTracker(); updateBarometer(); updateSportTracker();
-  updateTimeAndCalories(dtMs); updateDisplay(); printSerialData();
+  updateTimeAndCalories(dtMs); updateDisplay(); printSerialData(); updateHealthiCloud();
   delay(12);
 }
